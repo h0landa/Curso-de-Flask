@@ -1,4 +1,4 @@
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 
 lista_hoteis = [
     {'hotel_id':'primavera',
@@ -14,7 +14,7 @@ lista_hoteis = [
     'cidade':'Maxaranguape'
     }
     ,
-    {'hotel_id':'verão',
+    {'hotel_id':'verao',
     'nome':'Hotel Verão',
     'diaria': 160,
     'estrelas': 2.0,
@@ -35,18 +35,42 @@ class Hoteis(Resource):
 
 
 class Hotel(Resource):
-    def get(self, hotel_id):
+    argumentos = reqparse.RequestParser()
+    argumentos.add_argument('nome')
+    argumentos.add_argument('diaria')
+    argumentos.add_argument('estrelas')
+    argumentos.add_argument('cidade')
+
+    def encontrar_hotel(hotel_id):
         for hotel in lista_hoteis:
             if hotel['hotel_id'] == hotel_id:
                 return hotel
-        return {'message':'Hotel not found.'}, 404 #not found
+    def get(self, hotel_id):
+        hotel = Hotel.encontrar_hotel(hotel_id)
+        if hotel:
+            return hotel
+        return {'message':'Hotel not found.'}, 404 #NOT FOUND
     def post(self, hotel_id):
-        pass
+        dados = Hotel.argumentos.parse_args()
+        novo_hotel = {
+            'hotel_id':hotel_id, **dados}
+        lista_hoteis.append(novo_hotel)
+        return novo_hotel, 200 #SUCESS
     def put(self, hotel_id):
-        pass
-    def delet(self, hotel_id):
-        pass
-
+        dados = Hotel.argumentos.parse_args()
+        hotel = Hotel.encontrar_hotel(hotel_id)
+        novo_hotel = {'hotel_id':hotel_id, **dados}
+        if hotel:
+            hotel.update(novo_hotel)
+            return novo_hotel, 200
+        else:
+            print('Hotel não encontrado. Um novo hotel foi criado!.')
+            lista_hoteis.append(novo_hotel)
+            return novo_hotel, 201 #CRIATED ou CRIADO
+    def delete(self, hotel_id):
+        global lista_hoteis
+        lista_hoteis = [hotel for hotel in lista_hoteis if hotel['hotel_id'] != hotel_id]
+        return {'message':'hotel deleted.'}, 200
 
 class Hello(Resource):
     def get(self):
