@@ -2,15 +2,17 @@ from flask import Flask
 from flask_restful import Api
 from resources.hotel import Hoteis, Hotel, Hello
 
+
 app = Flask(__name__)
 api = Api(app)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///banco.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-@app.before_first_request
+
+@app.before_request
 def cria_banco():
     banco.create_all()
+
 
 api.add_resource(Hoteis, '/hoteis')
 api.add_resource(Hello, '/')
