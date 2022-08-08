@@ -27,14 +27,14 @@ class HotelModel(banco.Model):
         }
 
     @classmethod
-    def encontrar_hotel(cls, hotel_id):
+    def find_hotel(cls, hotel_id):
         hotel = cls.query.filter_by(hotel_id=hotel_id).first()
         if hotel:
             return hotel
         return None
 
     @classmethod
-    def buscar_hoteis(cls):
+    def search_hotels(cls):
         hoteis = cls.query.all()
         return hoteis
 
@@ -48,6 +48,6 @@ class HotelModel(banco.Model):
         self. estrelas = estrelas
         self.cidade = cidade
 
-    def excluir_hotel(self):
+    def delete_hotel(self):
         banco.session.delete(self)
         banco.session.commit()
