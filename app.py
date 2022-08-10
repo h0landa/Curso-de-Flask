@@ -6,6 +6,7 @@ from resources.hotel import Hoteis, Hotel, Hello
 from resources.usuario import User, RegisterUser, UserLogin, UserLogout
 from flask_jwt_extended import JWTManager
 from blacklist import BLACKLIST
+import datetime
 
 app = Flask(__name__)
 api = Api(app)
@@ -13,10 +14,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///banco.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'ultra_secreta'
 app.config['JWT_BLACKLIST_ENABLED'] = True
+app.config['JWT_EXPIRATION_DELTA'] = datetime.timedelta(days=7)
 jwt = JWTManager(app)
 
 
-@app.before_first_request
+@app.before_request
 def cria_banco():
     banco.create_all()
 
