@@ -3,6 +3,7 @@ from flask_restful import Api
 
 import blacklist
 from resources.hotel import Hoteis, Hotel, Hello
+from resources.site import Sites, Site
 from resources.usuario import User, RegisterUser, UserLogin, UserLogout
 from flask_jwt_extended import JWTManager
 from blacklist import BLACKLIST
@@ -40,6 +41,8 @@ api.add_resource(User, '/user/<int:user_id>')
 api.add_resource(RegisterUser, '/cadastro')
 api.add_resource(UserLogin, '/login')
 api.add_resource(UserLogout, '/logout')
+api.add_resource(Sites, '/sites')
+api.add_resource(Site, '/sites/<string:url>')
 
 if __name__ == '__main__':
     from sql_alchemy import banco

@@ -4,6 +4,7 @@ from models.modulos import internal_error
 from flask_jwt_extended import jwt_required
 import sqlite3
 from resources.filtros import normalize_path_params, consulta_com_cidade, consulta_sem_cidade
+from resources.site import SiteModel
 
 
 path_params = reqparse.RequestParser()
@@ -34,7 +35,8 @@ class Hoteis(Resource):
             'nome': linha[1],
             'estrelas': linha[2],
             'diaria': linha[3],
-            'cidade': linha[4]
+            'cidade': linha[4],
+            'site_id': linha[5]
             })
         return {'hoteis': hoteis} # SELECT * FROM hoteis
 
@@ -45,6 +47,7 @@ class Hotel(Resource):
     argumentos.add_argument('estrelas', type=float)
     argumentos.add_argument('diaria', type=str, required=True, help="This field 'diaria' cannot be blank.")
     argumentos.add_argument('cidade', type=str, required=True, help="This field 'cidade' cannot be blank.")
+    argumentos.add_argument('site_id', type=int, required=True, help="Every hotel needs to be linked with a site.")
 
     @jwt_required()
     def get(self, hotel_id):
@@ -60,11 +63,14 @@ class Hotel(Resource):
         dados = Hotel.argumentos.parse_args()
         print(dados)
         hotel = HotelModel(hotel_id, **dados)
-        try:
-            hotel.save_hotel()
-        except:
-            return internal_error(), 500 #Internal Error
-        return hotel.json(), 201 #SUCCESS
+        if not SiteModel.find_by_id(dados.get('site_id')):
+            return {'message': 'There is no website with this id.'}, 400
+        else:
+            try:
+                hotel.save_hotel()
+            except:
+                return internal_error(), 500  # Internal Error
+            return hotel.json(), 201 #SUCCESS
 
     @jwt_required()
     def put(self, hotel_id):
